@@ -1,0 +1,127 @@
+# Список мутантів L11 (крок 2 лабораторної).
+#
+# 1. Скопіюйте цей файл у mutants.toml.
+# 2. Впишіть 12 мутантів, по три на кожен клас:
+#      значення тіру · межа EUR 1 000 · арифметика · форма результату
+#    Поле class пишіть саме так, дослівно: "значення тіру", "межа EUR 1 000",
+#    "арифметика", "форма результату" — скрипт групує мутантів за цим рядком.
+# 3. Закомітьте mutants.toml ДО першого прогону:
+#      git add mutants.toml && git commit -m "L11: список мутантів"
+#    (Windows PowerShell: git add mutants.toml; git commit -m "L11: список мутантів")
+#    Після цього список не змінюється.
+#
+# Кожен мутант — одна маленька зміна в коді:
+#   id       — A-01…A-03, B-01…B-03, C-01…C-03, D-01…D-03
+#   class    — назва класу
+#   file     — файл, у якому міняємо (app/engines/fx.py або app/engines/policy.py)
+#   find     — рядок коду дослівно, як у файлі (з пробілами); має зустрічатися рівно 1 раз
+#   replace  — на що міняємо
+#   description — що зламано, людською мовою
+#
+# Якщо в рядку є лапки, беріть інші лапки навколо: find = '"tier2": 0.9'
+# Перевірка, що список застосовується: python tools/run_mutants.py --check
+
+
+# --- Клас A: значення тіру -------------------------------------------------
+
+[[mutant]]
+id = "A-01"
+class = "значення тіру"
+file = "app/engines/policy.py"
+find = '"tier2": 0.9'
+replace = '"tier2": 1.5'
+description = "клієнт tier2 платить 1.5 % замість 0.9 % (наслідок як у дефекту D20)"
+
+[[mutant]]
+id = "A-02"
+class = "значення тіру"
+file = "app/engines/policy.py"
+find = '"tier1": 1.5'
+replace = '"tier1": 0.9'
+description = "клієнт tier1 платить 0.9% замість 1.5%"
+
+[[mutant]]
+id = "A-03"
+class = "значення тіру"
+file = "app/engines/policy.py"
+find = '"tier2": 1000'
+replace = '"tier2": 500'
+description = "безкоштовний ліміт tier2 став EUR 500 замість EUR 1000"
+
+# --- Клас B: межа EUR 1 000 ------------------------------------------------
+
+[[mutant]]
+id = "B-01"
+class = "межа EUR 1 000"
+file = "app/engines/fx.py"
+find = 'amount_eur <= allowance_total'
+replace = 'amount_eur < allowance_total'
+description = "рівно на межі ліміту вже береться спред (<= замінено на <)"
+
+[[mutant]]
+id = "B-02"
+class = "межа EUR 1 000"
+file = "app/engines/fx.py"
+find = 'allowance_used_eur + amount_eur <= allowance_total'
+replace = 'amount_eur <= allowance_total'
+description = "вже використаний ліміт ігнорується при перевірці межі"
+
+[[mutant]]
+id = "B-03"
+class = "межа EUR 1 000"
+file = "app/engines/fx.py"
+find = 'allowance_used_eur + amount_eur <= allowance_total'
+replace = 'allowance_used_eur + amount <= allowance_total'
+description = "межа рахується в сирій сумі, а не в EUR-еквіваленті"
+
+# --- Клас C: арифметика ----------------------------------------------------
+
+[[mutant]]
+id = "C-01"
+class = "арифметика"
+file = "app/engines/fx.py"
+find = 'gross - spread_amount'
+replace = 'gross + spread_amount'
+description = "спред додається до gross замість віднімання"
+
+[[mutant]]
+id = "C-02"
+class = "арифметика"
+file = "app/engines/fx.py"
+find = 'gross * spread_pct / 100.0'
+replace = 'gross * spread_pct / 10.0'
+description = "спред поділено на 10 замість 100 (у 10 разів більший)"
+
+[[mutant]]
+id = "C-03"
+class = "арифметика"
+file = "app/engines/fx.py"
+find = 'amount * rate'
+replace = 'amount / rate'
+description = "gross рахується діленням на курс замість множення"
+
+# --- Клас D: форма результату ----------------------------------------------
+
+[[mutant]]
+id = "D-01"
+class = "форма результату"
+file = "app/engines/fx.py"
+find = 'allowance_applied=within'
+replace = 'allowance_applied=True'
+description = "allowance_applied завжди True замість фактичного значення"
+
+[[mutant]]
+id = "D-02"
+class = "форма результату"
+file = "app/engines/fx.py"
+find = 'round(v, 6)'
+replace = 'str(round(v, 6))'
+description = "as_dict() повертає рядки замість чисел"
+
+[[mutant]]
+id = "D-03"
+class = "форма результату"
+file = "app/engines/fx.py"
+find = 'isinstance(v, float)'
+replace = 'isinstance(v, int)'
+description = "as_dict() не округлює float (перевірка типу змінена на int)"
