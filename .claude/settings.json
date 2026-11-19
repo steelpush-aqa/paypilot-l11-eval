@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(app/engines/policy.py)",
+      "Read(README.md)",
+      "Read(ai-adoption-impact-report*.md)",
+      "Read(agent-prompt/**)",
+      "Read(prompts/**)",
+      "Read(tests/manual/**)",
+      "Read(mutants.toml)",
+      "Read(mutants.example.toml)",
+      "Read(reports/**)",
+      "Read(.env)",
+      "Edit(app/**)",
+      "Edit(tests/manual/**)",
+      "Edit(mutants.toml)",
+      "Edit(prompts/**)",
+      "Edit(.env)",
+      "Edit(agent-prompt/**)"
+    ]
+  }
+}
